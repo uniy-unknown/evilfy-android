@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://lrclib.net; worker-src 'self' blob:">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Evilfy</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="android.css">
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <div class="logo"><img src="logo.png" alt=""><span>Evilfy</span></div>
+      <nav>
+        <button class="nav" data-action="open-library">Library</button>
+        <button class="nav" id="navKaraoke" data-action="open-karaoke">Karaoke</button>
+        <button class="nav plain" data-action="open-settings">Settings</button>
+      </nav>
+      <div class="side-head">
+        <span>Playlists</span>
+        <button class="icon-btn" data-action="new-playlist" title="New playlist" aria-label="New playlist">+</button>
+      </div>
+      <ul id="playlistList"></ul>
+      <div id="sideArt"></div>
+    </aside>
+
+    <section id="stage">
+      <div id="topbar">
+        <button id="btnMenu" class="nav-arrow menu-btn" aria-label="Menu"><svg class="ic stroke" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <button id="btnBack" class="nav-arrow" aria-label="Back"><svg class="ic stroke" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button id="btnFwd" class="nav-arrow" aria-label="Forward"><svg class="ic stroke" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+        <button id="btnMini" class="btn small" title="Mini player (Ctrl+M)">Mini player</button>
+        <input id="search" type="search" placeholder="Search your library" aria-label="Search your library">
+      </div>
+      <main id="main"></main>
+    </section>
+
+    <aside id="queuePanel" hidden></aside>
+    <aside id="lyricsPanel" hidden></aside>
+
+    <footer id="player">
+      <div class="np">
+        <div class="np-title" id="npTitle">Nothing playing</div>
+        <div class="np-artist" id="npArtist"></div>
+      </div>
+      <div class="center">
+        <div class="controls">
+          <button id="btnShuffle" class="btn small toggle" aria-pressed="false">Shuffle</button>
+          <button id="btnPrev" class="ctl" aria-label="Previous song"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="3" height="14" rx="1"/><path d="M19 5v14L9 12z"/></svg></button>
+          <button id="btnPlay" class="ctl main" aria-label="Play"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg></button>
+          <button id="btnNext" class="ctl" aria-label="Next song"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l10-7z"/><rect x="16" y="5" width="3" height="14" rx="1"/></svg></button>
+          <button id="btnRepeat" class="btn small toggle" aria-pressed="false">Repeat</button>
+        </div>
+        <div class="seekrow">
+          <span id="cur">0:00</span>
+          <input id="seek" type="range" min="0" max="1000" value="0" aria-label="Seek">
+          <span id="tot">0:00</span>
+        </div>
+      </div>
+      <div class="right">
+        <button id="btnSleep" class="btn small toggle" aria-pressed="false">Sleep</button>
+        <button id="btnLyrics" class="btn small" aria-pressed="false">Lyrics</button>
+        <button id="btnQueue" class="btn small" aria-pressed="false">Queue</button>
+        <input id="vol" type="range" min="0" max="100" value="80" aria-label="Volume" title="Volume">
+      </div>
+    </footer>
+  </div>
+
+  <div id="miniPlayer">
+    <div id="miniArt"></div>
+    <div class="mini-main">
+      <div class="mini-top">
+        <div class="mini-title" id="miniTitle">Nothing playing</div>
+        <button id="btnExpand" class="btn small" title="Back to the full window (Ctrl+M)">Expand</button>
+      </div>
+      <div class="mini-artist" id="miniArtist"></div>
+      <div class="mini-lyric" id="miniLyric"></div>
+      <input id="miniSeek" type="range" min="0" max="1000" value="0" aria-label="Seek">
+      <div class="mini-controls">
+        <button id="btnMiniShuffle" class="btn small toggle" aria-pressed="false">Shuffle</button>
+        <button id="btnMiniPrev" class="ctl" aria-label="Previous song"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="3" height="14" rx="1"/><path d="M19 5v14L9 12z"/></svg></button>
+        <button id="btnMiniPlay" class="ctl main" aria-label="Play"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg></button>
+        <button id="btnMiniNext" class="ctl" aria-label="Next song"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l10-7z"/><rect x="16" y="5" width="3" height="14" rx="1"/></svg></button>
+        <button id="btnMiniRepeat" class="btn small toggle" aria-pressed="false">Repeat</button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audio"></audio>
+  <audio id="audio2"></audio>
+  <div id="ctx" role="menu" hidden></div>
+  <div id="dropHint" hidden>Drop songs, folders, or playlists here</div>
+  <div id="toast" role="status" hidden></div>
+
+  <dialog id="textDialog">
+    <form method="dialog" id="dlgForm">
+      <h2 id="dlgTitle">Name</h2>
+      <input id="dlgInput" type="text" maxlength="60" autocomplete="off" aria-labelledby="dlgTitle">
+      <div class="dlg-actions">
+        <button type="button" class="btn" id="dlgCancel">Cancel</button>
+        <button type="submit" class="btn primary" value="ok">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="infoDialog">
+    <h2>Song info</h2>
+    <div id="infoBody"></div>
+    <form method="dialog" class="dlg-actions">
+      <button class="btn primary">Close</button>
+    </form>
+  </dialog>
+
+  <dialog id="editDialog">
+    <form method="dialog" id="edForm">
+      <h2 id="edTitle">Edit info</h2>
+      <div class="ed-grid">
+        <div class="ed-cover">
+          <div id="edCover"></div>
+          <button type="button" class="btn small" id="edPick">Choose image...</button>
+          <button type="button" class="btn small" id="edClear">Remove cover</button>
+        </div>
+        <div id="edFields" class="ed-fields"></div>
+      </div>
+      <div id="edLyricsWrap">
+        <div class="lyr-head">
+          <label for="edLyrics">Lyrics (plain text, or LRC lines like [01:23.45] words)</label>
+          <button type="button" class="btn small" id="edGetLyrics">Get synced lyrics</button>
+        </div>
+        <textarea id="edLyrics" rows="6"></textarea>
+      </div>
+      <p class="ed-note">Changes are saved in Evilfy only. Your music files are not touched.</p>
+      <div class="dlg-actions">
+        <button type="button" class="btn" id="edCancel">Cancel</button>
+        <button type="submit" class="btn primary" value="ok">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+
+  <dialog id="choiceDialog">
+    <form method="dialog">
+      <h2 id="chTitle"></h2>
+      <p id="chMsg" class="ch-msg"></p>
+      <div class="dlg-actions" id="chBtns"></div>
+    </form>
+  </dialog>
+
+  <dialog id="settingsDialog">
+    <form method="dialog" id="setForm">
+      <h2>Settings</h2>
+      <h3>Playback</h3>
+      <label class="chk-row"><input type="checkbox" id="setGapless"> Gapless playback</label>
+      <p class="set-note">Starts the next song the moment the current one ends. Turn this off if you ever hear skips.</p>
+      <h3>Discord</h3>
+      <label class="chk-row"><input type="checkbox" id="setRpc"> Show what I'm listening to on Discord</label>
+      <div class="set-field">
+        <label for="setRpcId">Application ID</label>
+        <input id="setRpcId" type="text" inputmode="numeric" autocomplete="off">
+      </div>
+      <p class="set-note" id="rpcStatus"></p>
+      <p class="set-note">To show the Evilfy logo next to your status, upload <b>discord-evilfy-512.png</b> (in the build folder) under Rich Presence, Art Assets in your Discord application, and name it <b>evilfy</b>.</p>
+      <h3>Karaoke</h3>
+      <label class="chk-row"><input type="checkbox" id="setOnlineLyrics"> Allow online lyrics lookup (lrclib.net)</label>
+      <p class="set-note">Only runs when you click Get synced lyrics. It sends the song title, artist, album, and length to lrclib.net.</p>
+      <label class="chk-row"><input type="checkbox" id="setRecAdd"> Add my recordings to the library</label>
+      <div class="set-field">
+        <label for="setRecFolder">Recordings folder</label>
+        <div class="set-row">
+          <input id="setRecFolder" type="text" placeholder="Documents\Evilfy Recordings" autocomplete="off">
+          <button type="button" class="btn small" id="setRecPick">Choose...</button>
+        </div>
+      </div>
+      <div class="dlg-actions">
+        <button type="button" class="btn" id="setCancel">Cancel</button>
+        <button type="submit" class="btn primary" value="ok">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="shim.js"></script>
+</body>
+</html>

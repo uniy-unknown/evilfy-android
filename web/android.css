@@ -1,0 +1,28 @@
+/* Android-only touch layout, applied on top of styles.css */
+html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+body.android { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* Features that only exist on desktop */
+body.android #btnMini,
+body.android #miniPlayer,
+body.android #vol,
+body.android [data-action="add-folder"],
+body.android #setRpc, body.android label[for="setRpc"], body.android #setRpcId, body.android #rpcStatus,
+body.android #setRecPick, body.android #setRecFolder { display: none !important; }
+body.android .chk-row:has(#setRpc), body.android .set-field:has(#setRpcId), body.android .set-field:has(#setRecFolder) { display: none !important; }
+
+/* Bigger tap targets */
+body.android .btn, body.android .nav, body.android .nav-arrow { min-height: 44px; }
+body.android .btn.small { min-height: 40px; padding-left: 12px; padding-right: 12px; }
+body.android .ctl { min-width: 48px; min-height: 48px; }
+body.android input[type="range"] { height: 32px; }
+body.android .row { min-height: 52px; }
+body.android #topbar { gap: 8px; }
+body.android #search { min-height: 44px; font-size: 16px; }
+body.android dialog { max-width: 94vw; max-height: 88vh; overflow: auto; }
+body.android input, body.android textarea, body.android select { font-size: 16px; } /* stops zoom-on-focus */
+
+/* Player bar: song on top, controls and seek bar below, secondary buttons wrap */
+body.android #player { padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+body.android .controls { justify-content: center; }
+body.android .right { justify-content: center; }

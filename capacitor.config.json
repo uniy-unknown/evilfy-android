@@ -1,0 +1,7 @@
+{
+  "appId": "com.evilfy.player",
+  "appName": "Evilfy",
+  "webDir": "www",
+  "backgroundColor": "#373737",
+  "android": { "allowMixedContent": false }
+}

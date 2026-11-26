@@ -1,0 +1,25 @@
+{
+  "name": "evilfy-android",
+  "version": "0.6.0",
+  "private": true,
+  "description": "Evilfy for Android (Capacitor)",
+  "scripts": {
+    "build": "node scripts/build-web.mjs",
+    "sync": "npm run build && npx cap sync android",
+    "apk": "npm run sync && cd android && ./gradlew assembleDebug",
+    "open": "npx cap open android"
+  },
+  "dependencies": {
+    "@anuradev/capacitor-background-mode": "^8.1.0",
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/filesystem": "^8.1.0",
+    "@capacitor/share": "^8.0.0",
+    "music-metadata-browser": "^2.5.11"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
+    "esbuild": "^0.25.0"
+  }
+}
